@@ -17,7 +17,7 @@ const isAdult = (dateString) => {
 const publicUser = (user) => ({
   _id: user._id, name: user.name, email: user.email, bio: user.bio,
   gender: user.gender, interestedIn: user.interestedIn, images: user.images,
-  location: user.location, token: createToken(user._id),
+  token: createToken(user._id),
 });
 
 const registerUser = async (req, res) => {
