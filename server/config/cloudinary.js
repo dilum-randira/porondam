@@ -15,7 +15,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: 'pulse_profiles',
+    folder: 'porondam_profiles',
     allowed_formats: ['jpeg', 'png', 'jpg'],
     transformation: [{ width: 800, height: 800, crop: 'limit' }],
   },
@@ -27,7 +27,7 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024, // 5MB
   },
   fileFilter: (req, file, cb) => {
-    if (!file.mimetype.startsWith('image/')) {
+    if (!['image/jpeg', 'image/png'].includes(file.mimetype) || !/\.(jpe?g|png)$/i.test(file.originalname || '')) {
       return cb(new Error('Only image files are allowed'));
     }
     cb(null, true);

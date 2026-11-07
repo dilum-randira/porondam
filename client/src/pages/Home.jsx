@@ -1,271 +1,132 @@
-import { ArrowRight, Globe, Heart, Mail, MessageCircle, Send, Sparkles, Users, Wand2 } from 'lucide-react';
+import { ArrowRight, Heart, LockKeyhole, MessageCircle, ShieldCheck, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import Button from '../components/ui/Button';
 import romanticDate from '../assets/romantic-date.svg';
 
-const steps = [
-  {
-    icon: Users,
-    title: 'Create Profile',
-    text: 'Set up your profile with photos and interests'
-  },
-  {
-    icon: Sparkles,
-    title: 'Discover Matches',
-    text: 'Browse profiles and find your perfect match'
-  },
-  {
-    icon: MessageCircle,
-    title: 'Start Chatting',
-    text: 'Connect with people who match your vibe'
-  },
-  {
-    icon: Heart,
-    title: 'Find Love',
-    text: 'Build meaningful connections and relationships'
-  }
-];
-
-const features = [
-  {
-    icon: Wand2,
-    title: 'Smart Matching',
-    text: 'Our algorithm finds your perfect matches based on compatibility'
-  },
-  {
-    icon: Sparkles,
-    title: 'Safe & Secure',
-    text: 'Verified profiles and secure messaging to keep you safe'
-  },
-  {
-    icon: Users,
-    title: 'Real Connections',
-    text: 'Meet genuine people looking for meaningful relationships'
-  }
-];
-
-const reasons = [
-  'Verified profiles for genuine connections',
-  'Fast, intuitive matching algorithm',
-  'Real-time messaging and notifications',
-  'Privacy-first design you can trust'
+const journeys = [
+  { number: '01', title: 'Tell your story', detail: 'Create a profile and share only the information you choose.' },
+  { number: '02', title: 'Discover intentionally', detail: 'Explore profiles with relationship preferences in mind, not endless swiping.' },
+  { number: '03', title: 'Connect by mutual interest', detail: 'Start a conversation when two people have chosen each other.' },
 ];
 
 function Home() {
   return (
-    <div className="min-h-screen bg-pulse-light text-slate-800">
-      <main>
-        <section className="mx-auto max-w-7xl px-2 pt-2 sm:px-4 sm:pt-4 lg:px-6">
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-rose-100 bg-white shadow-xl">
-            <img
-              src={romanticDate}
-              alt="Romantic dinner date under the moonlight"
-              className="h-[620px] w-full object-cover object-center"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/40 to-transparent" />
-
-            <div className="absolute inset-x-0 top-0 px-4 pt-4 sm:px-6 sm:pt-5 lg:px-8">
-              <div className="flex items-center justify-between rounded-[1.8rem] bg-white/90 px-4 py-3 backdrop-blur sm:px-6">
-                <Link to="/" className="inline-flex items-center text-4xl font-black leading-none tracking-tight text-romantic-accent">
-                  Pulse
-                  <span className="text-romantic-primary">.</span>
-                </Link>
-
-                <nav className="hidden items-center gap-8 text-base font-semibold text-slate-700 lg:flex">
-                  <a href="#" className="text-romantic-primary">Home</a>
-                  <a href="#features" className="hover:text-romantic-primary">Browse Matches</a>
-                  <a href="#why-pulse" className="hover:text-romantic-primary">Profile</a>
-                  <a href="#footer" className="hover:text-romantic-primary">Messages</a>
-                </nav>
-
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <Link to="/login">
-                    <Button variant="outline" className="rounded-full px-6 py-2 text-sm">
-                      Login
-                    </Button>
-                  </Link>
-                  <Link to="/register">
-                    <Button className="rounded-full px-6 py-2 text-sm">
-                      Register
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute left-0 top-0 flex h-full w-full items-center px-6 sm:px-10 lg:px-14">
-              <div className="max-w-xl pt-20 sm:pt-24">
-                <h1 className="text-4xl font-semibold italic leading-[1.05] text-romantic-accent sm:text-6xl lg:text-7xl">
-                  A Hundred Roses,
-                  <span className="block text-romantic-primary">A Million Dreams</span>
-                </h1>
-
-                <p className="mt-6 max-w-lg text-lg leading-8 text-slate-700">
-                  Find your perfect match in a community of genuine people looking for meaningful
-                  connections. Your love story begins here.
-                </p>
-
-                <div className="mt-8 flex flex-wrap gap-4">
-                  <Link to="/register">
-                    <Button className="rounded-full px-8 py-3 text-base">
-                      <Heart className="mr-2 h-4 w-4" />
-                      Join Free
-                    </Button>
-                  </Link>
-                  <a
-                    href="#how-it-works"
-                    className="inline-flex items-center justify-center rounded-full border border-romantic-primary px-8 py-3 text-base font-semibold text-romantic-primary transition hover:bg-romantic-primary/10"
-                  >
-                    Learn More
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </a>
-                </div>
-
-                <div className="mt-8 inline-flex items-center gap-3 rounded-[1.6rem] bg-white/90 px-5 py-3 backdrop-blur">
-                    <a href="#" className="rounded-full border border-rose-200 p-2 text-romantic-primary hover:bg-rose-50">
-                      <Globe className="h-4 w-4" />
-                  </a>
-                  <a href="#" className="rounded-full border border-rose-200 p-2 text-romantic-primary hover:bg-rose-50">
-                      <Mail className="h-4 w-4" />
-                  </a>
-                  <a href="#" className="rounded-full border border-rose-200 p-2 text-romantic-primary hover:bg-rose-50">
-                      <Send className="h-4 w-4" />
-                  </a>
-                  <Link to="/register" className="rounded-full border border-rose-200 p-2 text-romantic-primary hover:bg-rose-50">
-                    <Heart className="h-4 w-4" />
-                  </Link>
-                </div>
-              </div>
-            </div>
+    <div className="min-h-screen bg-[#faf7f5] text-[#281e2a]">
+      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:p-3">
+        Skip to content
+      </a>
+      <header className="relative z-10 border-b border-[#e8d9e0] bg-[#faf7f5]/95">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-8">
+          <Link to="/" className="flex flex-col leading-tight text-[#512941]" aria-label="Porondam home">
+            <span className="text-2xl font-semibold tracking-tight">porondam<span className="text-[#b64b71]">.</span></span>
+            <span lang="si" className="text-xs tracking-wide">පොරොන්දම්</span>
+          </Link>
+          <nav aria-label="Main navigation" className="hidden items-center gap-7 text-sm font-medium md:flex">
+            <a href="#how-it-works" className="hover:text-[#a92f5b] focus-visible:underline">How it works</a>
+            <a href="#about" className="hover:text-[#a92f5b] focus-visible:underline">Our approach</a>
+            <a href="#privacy" className="hover:text-[#a92f5b] focus-visible:underline">Privacy & safety</a>
+          </nav>
+          <div className="flex items-center gap-3 text-sm font-semibold">
+            <Link to="/login" className="rounded-full px-3 py-2 text-[#512941] hover:bg-[#f0e4e9] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a92f5b]">Sign in</Link>
+            <Link to="/register" className="rounded-full bg-[#512941] px-5 py-2.5 text-white transition hover:bg-[#703958] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#512941]">Create an account</Link>
           </div>
-        </section>
+        </div>
+      </header>
 
-        <section id="how-it-works" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-romantic-primary">How it works</p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-romantic-accent sm:text-4xl">
-              Your simple path to finding your next match
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-gray-600">
-              A smooth experience that keeps the focus on meeting people, not learning a complicated app.
+      <main id="main">
+        <section className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-14 sm:px-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-16 lg:py-24">
+          <div>
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#e8cad6] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#843a5a]">
+              <Heart className="h-3.5 w-3.5" aria-hidden="true" />
+              Sri Lankan roots. Meaningful beginnings.
+            </p>
+            <h1 className="max-w-2xl font-serif text-[clamp(3rem,6.5vw,6.5rem)] leading-[1.02] tracking-[-0.045em] text-[#3b2034]">
+              Something <em className="font-normal text-[#b64b71]">meaningful</em> starts here.
+            </h1>
+            <p className="mt-7 max-w-xl text-lg leading-8 text-[#584b55]">
+              Porondam is being built for Sri Lankans at home and abroad who value real conversations, thoughtful introductions, and the freedom to move at their own pace.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <Link to="/register" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#9f325d] px-6 py-3 font-semibold text-white transition hover:bg-[#7b2548] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9f325d]">
+                Explore the prototype <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <a href="#how-it-works" className="inline-flex min-h-12 items-center rounded-full border border-[#d7bbc6] px-6 py-3 font-semibold text-[#512941] hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9f325d]">
+                See how it works
+              </a>
+            </div>
+            <p className="mt-5 max-w-lg text-xs leading-5 text-[#6f5d67]" role="note">
+              Early-stage prototype. Not yet ready for real personal information. Age eligibility is self-declared, and safety features are still in development.
             </p>
           </div>
+          <figure className="relative overflow-hidden rounded-[2.25rem] bg-[#e8d5df] shadow-[0_24px_70px_-35px_rgba(80,34,60,0.35)]">
+            <img src={romanticDate} alt="Illustration of a romantic evening scene" className="aspect-[4/4.5] w-full object-cover" />
+            <figcaption className="absolute bottom-4 left-4 right-4 rounded-xl bg-[#faf7f5]/95 px-5 py-4 text-sm text-[#512941] shadow-sm">
+              Made for conversations that matter. <span className="block text-xs text-[#6e5b67]">Illustrative artwork, not a member profile.</span>
+            </figcaption>
+          </figure>
+        </section>
 
-          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {steps.map(({ icon: Icon, title, text }) => (
-              <div key={title} className="rounded-3xl border border-rose-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-romantic-primary">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <h3 className="mt-5 text-lg font-bold text-romantic-accent">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-gray-600">{text}</p>
+        <section id="how-it-works" className="border-y border-[#e7d7df] bg-white/70 py-16 sm:py-20">
+          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+            <div className="grid gap-5 md:grid-cols-2 md:items-end">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9f325d]">The experience</p>
+                <h2 className="mt-4 max-w-md font-serif text-4xl leading-tight text-[#3b2034] sm:text-5xl">A little more intention. A lot less noise.</h2>
               </div>
-            ))}
+              <p className="max-w-md text-base leading-7 text-[#655764]">Our goal is a clear, respectful path from your first introduction to a genuine connection.</p>
+            </div>
+            <ol className="mt-12 grid gap-8 border-t border-[#e7d7df] pt-8 md:grid-cols-3">
+              {journeys.map((item) => (
+                <li key={item.number} className="border-l-2 border-[#bb6786] pl-5">
+                  <span className="font-serif text-3xl text-[#9f325d]">{item.number}</span>
+                  <h3 className="mt-5 text-xl font-semibold text-[#3b2034]">{item.title}</h3>
+                  <p className="mt-3 max-w-sm leading-7 text-[#655764]">{item.detail}</p>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
 
-        <section id="features" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-          <div className="grid gap-5 lg:grid-cols-3">
-            {features.map(({ icon: Icon, title, text }) => (
-              <div key={title} className="rounded-3xl border border-rose-100 bg-white p-6 shadow-sm">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-romantic-primary">
-                  <Icon className="h-7 w-7" />
-                </div>
-                <h3 className="mt-5 text-xl font-bold text-romantic-accent">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-gray-600">{text}</p>
-                <Link to="/register" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-romantic-primary hover:underline">
-                  Try now <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            ))}
+        <section id="about" className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 sm:px-8 lg:grid-cols-2 lg:py-24">
+          <div className="rounded-[2rem] bg-[#3b2034] p-9 text-white sm:p-12">
+            <Users className="h-9 w-9 text-[#f2b4cb]" aria-hidden="true" />
+            <p className="mt-9 text-sm font-semibold uppercase tracking-[0.18em] text-[#f2b4cb]">Built with Sri Lanka in mind</p>
+            <h2 className="mt-4 font-serif text-4xl leading-tight sm:text-5xl">The culture you know. The connection you choose.</h2>
+            <p className="mt-6 leading-8 text-[#eddfe8]">Optional district preferences are being introduced, with Sinhala, Tamil and English experiences on the roadmap. Your interests and intentions should always be yours to share.</p>
+          </div>
+          <div className="space-y-8 lg:px-6">
+            <div className="flex items-start gap-4">
+              <Heart className="mt-1 h-6 w-6 shrink-0 text-[#9f325d]" aria-hidden="true" />
+              <div><h3 className="text-xl font-semibold">Mutual interest first</h3><p className="mt-2 leading-7 text-[#655764]">The prototype supports likes and mutual matches before messaging.</p></div>
+            </div>
+            <div className="flex items-start gap-4">
+              <MessageCircle className="mt-1 h-6 w-6 shrink-0 text-[#9f325d]" aria-hidden="true" />
+              <div><h3 className="text-xl font-semibold">Room for real conversation</h3><p className="mt-2 leading-7 text-[#655764]">A simple chat experience to help connections develop naturally.</p></div>
+            </div>
+            <div className="flex items-start gap-4">
+              <LockKeyhole className="mt-1 h-6 w-6 shrink-0 text-[#9f325d]" aria-hidden="true" />
+              <div><h3 className="text-xl font-semibold">Privacy as an ongoing commitment</h3><p className="mt-2 leading-7 text-[#655764]">We are reducing location precision and hardening account controls. Private photos, moderation and reporting are not yet complete.</p></div>
+            </div>
           </div>
         </section>
 
-        <section id="why-pulse" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-          <div className="grid items-center gap-8 rounded-[2rem] border border-rose-100 bg-white p-6 shadow-sm lg:grid-cols-[1.05fr_0.95fr] lg:p-10">
-            <div className="overflow-hidden rounded-[1.75rem] border-4 border-rose-200 shadow-lg">
-              <img
-                src={romanticDate}
-                alt="Couple on a romantic date"
-                className="h-full w-full object-cover object-center"
-              />
+        <section id="privacy" className="bg-[#f2e7eb] py-16">
+          <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 sm:px-8 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-2xl">
+              <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#843a5a]"><ShieldCheck className="h-4 w-4" aria-hidden="true" /> Safety status</p>
+              <h2 className="mt-3 font-serif text-3xl text-[#3b2034] sm:text-4xl">Trust is built, not claimed.</h2>
+              <p className="mt-4 leading-7 text-[#655764]">Porondam is for adults aged 18 or over. Identity verification, anti-scam controls, blocking and reporting require further work before a public launch. Do not share sensitive details or payments in the prototype.</p>
             </div>
-
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-romantic-primary">Why choose Pulse</p>
-              <h2 className="mt-3 text-3xl font-black tracking-tight text-romantic-accent sm:text-4xl">
-                A cleaner way to meet someone worth your time.
-              </h2>
-
-              <div className="mt-6 space-y-4">
-                {reasons.map((reason) => (
-                  <div key={reason} className="flex items-start gap-3 rounded-2xl bg-rose-50/70 p-4">
-                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-romantic-primary shadow-sm">
-                      <Heart className="h-4 w-4" />
-                    </span>
-                    <p className="text-sm leading-6 text-gray-700">{reason}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Link to="/login">
-                  <Button variant="outline" className="px-6 py-3 text-base">
-                    Log in
-                  </Button>
-                </Link>
-                <Link to="/register">
-                  <Button className="px-6 py-3 text-base">
-                    Join Pulse
-                  </Button>
-                </Link>
-              </div>
-            </div>
+            <Link to="/register" className="inline-flex shrink-0 items-center justify-center rounded-full border border-[#9f325d] px-6 py-3 font-semibold text-[#843a5a] hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#843a5a]">
+              View prototype <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+            </Link>
           </div>
         </section>
       </main>
 
-      <footer id="footer" className="mt-8 bg-[#111827] text-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-4 lg:px-8">
-          <div>
-            <div className="inline-flex items-center gap-2 text-2xl font-black tracking-tight text-white">
-              <span className="text-rose-300">Pulse</span>
-              <span className="text-romantic-primary">.</span>
-            </div>
-            <p className="mt-4 max-w-sm text-sm leading-6 text-slate-300">
-              Meet, match, and message in a dating app designed to feel warm, simple, and modern.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-300">About</h3>
-            <ul className="mt-4 space-y-3 text-sm text-slate-300">
-              <li><a href="#how-it-works" className="hover:text-white">How it works</a></li>
-              <li><a href="#features" className="hover:text-white">Features</a></li>
-              <li><a href="#why-pulse" className="hover:text-white">Why Pulse</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-300">Access</h3>
-            <ul className="mt-4 space-y-3 text-sm text-slate-300">
-              <li><Link to="/login" className="hover:text-white">Log in</Link></li>
-              <li><Link to="/register" className="hover:text-white">Sign up</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-300">Social</h3>
-            <div className="mt-4 flex gap-3 text-slate-300">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5">in</span>
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5">ig</span>
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5">fb</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-white/10 py-4 text-center text-xs text-slate-400">
-          © 2026 Pulse. All rights reserved.
+      <footer className="bg-[#281e2a] text-[#e9dee5]">
+        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 px-5 py-10 sm:px-8 md:flex-row md:items-end">
+          <div><p className="text-2xl font-semibold text-white">porondam<span className="text-[#e59cb7]">.</span></p><p lang="si" className="mt-1 text-sm">පොරොන්දම්</p><p className="mt-3 text-sm">A Sri Lankan matchmaking experience in development.</p></div>
+          <p className="text-xs text-[#cbbdc6]">© 2026 Porondam. Prototype — not production-ready.</p>
         </div>
       </footer>
     </div>

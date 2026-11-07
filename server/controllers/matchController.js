@@ -11,38 +11,28 @@ const getFeed = async (req, res) => {
       return res.status(404).json({ message: 'Current user not found.' });
     }
 
-    const coordinates = currentUser.location?.coordinates;
-    const hasCoordinates =
-      Array.isArray(coordinates) && coordinates.length === 2 && coordinates.every(Number.isFinite);
-
-    if (!hasCoordinates) {
-      return res.status(400).json({ message: 'Current user location is required for discovery.' });
-    }
-
+    // Only self-declared adults are eligible for discovery. Older accounts
+    // without a birth date remain stored but are not advertised.
+    const today = new Date();
+    const adultCutoff = new Date(Date.UTC(
+      today.getUTCFullYear() - 18, today.getUTCMonth(), today.getUTCDate()
+    ));
     const interactions = await Interaction.find({ user: currentUser._id }).select('targetUser');
     const swipedUserIds = interactions.map((item) => item.targetUser);
-
     const feedFilter = {
-      _id: {
-        $ne: new mongoose.Types.ObjectId(currentUser._id),
-        $nin: swipedUserIds,
-      },
-      location: {
-        $near: {
-          $geometry: {
-            type: 'Point',
-            coordinates,
-          },
-        },
-      },
+      _id: { $nin: [currentUser._id, ...swipedUserIds] },
+      dateOfBirth: { $lte: adultCutoff },
     };
+
+    // No $near query or coordinate requirement; district is optional.
+    if (currentUser.district) feedFilter.district = currentUser.district;
 
     if (currentUser.interestedIn && currentUser.interestedIn !== 'everyone') {
       feedFilter.gender = currentUser.interestedIn;
     }
 
     const users = await User.find(feedFilter)
-      .select('name bio gender interestedIn images location')
+      .select('name bio gender interestedIn images district')
       .limit(25);
 
     return res.json(users);
@@ -55,7 +45,7 @@ const swipe = async (req, res) => {
   try {
     const { targetUserId, action } = req.body;
 
-    if (!targetUserId || !action) {
+    if (!mongoose.isValidObjectId(targetUserId) || !action) {
       return res.status(400).json({ message: 'targetUserId and action are required.' });
     }
 
@@ -67,7 +57,14 @@ const swipe = async (req, res) => {
       return res.status(400).json({ message: 'You cannot swipe on yourself.' });
     }
 
-    const targetUserExists = await User.exists({ _id: targetUserId });
+    const today = new Date();
+    const adultCutoff = new Date(Date.UTC(
+      today.getUTCFullYear() - 18, today.getUTCMonth(), today.getUTCDate()
+    ));
+    const targetUserExists = await User.exists({
+      _id: targetUserId,
+      dateOfBirth: { $lte: adultCutoff },
+    });
     if (!targetUserExists) {
       return res.status(404).json({ message: 'Target user not found.' });
     }

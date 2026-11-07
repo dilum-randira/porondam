@@ -55,12 +55,12 @@ function LoginForm() {
       <div className="w-full max-w-md space-y-8 px-6 py-8 md:px-10">
         <div className="space-y-2">
           <div className="inline-flex items-baseline gap-1 text-2xl font-semibold tracking-tight text-pulse-primary">
-            <span className="tracking-tight">Pulse</span>
+            <span className="tracking-tight">Porondam</span>
             <span className="text-3xl leading-none">.</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900">Login</h1>
           <p className="text-sm text-gray-500">
-            Welcome to our website! Please login to continue.
+            Welcome back. Sign in to continue your connections.
           </p>
         </div>
 
@@ -115,18 +115,12 @@ function LoginForm() {
             )}
           </div>
 
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>Forgot Password?</span>
-            <button
-              type="button"
-              className="font-medium text-pulse-primary hover:underline"
-            >
-              Recover Password
-            </button>
-          </div>
+          <p className="text-xs leading-5 text-gray-500">
+            Password recovery is not yet available in this prototype. Do not use a password that you use elsewhere.
+          </p>
 
           {errorMessages.general && (
-            <p className="text-xs text-red-500">{errorMessages.general}</p>
+            <p role="alert" className="text-xs text-red-700">{errorMessages.general}</p>
           )}
 
           <Button
@@ -137,21 +131,6 @@ function LoginForm() {
             {isSubmitting ? 'Signing In...' : 'Sign In'}
           </Button>
 
-          <div className="flex items-center gap-3 text-xs text-gray-400">
-            <div className="h-px flex-1 bg-gray-200" />
-            <span>OR</span>
-            <div className="h-px flex-1 bg-gray-200" />
-          </div>
-
-          <button
-            type="button"
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-          >
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-base font-bold text-pulse-primary">
-              G
-            </span>
-            <span>Sign Up with Google</span>
-          </button>
         </form>
 
         <p className="pt-2 text-center text-xs text-gray-500">

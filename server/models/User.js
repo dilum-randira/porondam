@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
+    dateOfBirth: { type: Date, default: null, select: false },
     bio: {
       type: String,
       default: '',
@@ -34,6 +35,8 @@ const userSchema = new mongoose.Schema(
       default: '',
       trim: true,
     },
+    // Coarse location preference; exact coordinates are legacy data only.
+    district: { type: String, default: '', trim: true },
     images: {
       type: [String],
       default: [],

@@ -12,7 +12,9 @@ export const connectSocket = (token) => {
   }
 
   if (!socket) {
-    socket = io('http://localhost:5000', {
+    const apiEndpoint = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const socketEndpoint = import.meta.env.VITE_SOCKET_URL || apiEndpoint.replace(/\/api\/?$/, '');
+    socket = io(socketEndpoint, {
       autoConnect: false,
       auth: {
         token,

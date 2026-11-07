@@ -2,14 +2,24 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import { useAuth } from '../../context/AuthContext';
-import { hasMinPasswordLength, isValidEmail } from '../../utils/validation';
+import { isValidEmail } from '../../utils/validation';
+
+const DISTRICTS = [
+  'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle',
+  'Gampaha', 'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle',
+  'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale', 'Matara',
+  'Monaragala', 'Mullaitivu', 'Nuwara Eliya', 'Polonnaruwa',
+  'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya',
+];
 
 const initialFormData = {
   name: '',
   email: '',
   password: '',
+  dateOfBirth: '',
   gender: '',
   interestedIn: '',
+  district: '',
   bio: '',
 };
 
@@ -35,11 +45,19 @@ function RegisterForm() {
       setError('Please enter a valid email address.');
       return false;
     }
-    if (!hasMinPasswordLength(formData.password)) {
-      setError('Password must be at least 6 characters.');
+    if (formData.password.length < 12) {
+      setError('Password must be at least 12 characters.');
       return false;
     }
 
+    const birth = new Date(formData.dateOfBirth + 'T00:00:00Z');
+    const today = new Date();
+    const cutoff = new Date(Date.UTC(today.getUTCFullYear() - 18, today.getUTCMonth(), today.getUTCDate()));
+    if (!formData.dateOfBirth || !Number.isFinite(birth.getTime()) ||
+        birth.toISOString().slice(0, 10) !== formData.dateOfBirth || birth > cutoff) {
+      setError('You must be at least 18 years old to register.');
+      return false;
+    }
     return true;
   };
 
@@ -78,14 +96,7 @@ function RegisterForm() {
 
     try {
       setIsSubmitting(true);
-      await register({
-        ...formData,
-        images: [],
-        location: {
-          type: 'Point',
-          coordinates: [0, 0],
-        },
-      });
+      await register(formData);
       navigate('/dashboard');
     } catch (err) {
       setError(err?.response?.data?.message || 'Unable to create account right now.');
@@ -99,11 +110,11 @@ function RegisterForm() {
       <div className="w-full max-w-md space-y-6 px-6 py-8 md:px-10">
         <div className="space-y-2">
           <div className="inline-flex items-baseline gap-1 text-2xl font-semibold tracking-tight text-pulse-primary">
-            <span className="tracking-tight">Pulse</span>
+            <span className="tracking-tight">Porondam</span>
             <span className="text-3xl leading-none">.</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900">Sign Up</h1>
-          <p className="text-sm text-gray-500">Create your account to start your Pulse journey.</p>
+          <p className="text-sm text-gray-500">Create your account to find a meaningful connection.</p>
           <p className="text-xs text-gray-400">Step {step} of 2</p>
         </div>
 
@@ -144,12 +155,16 @@ function RegisterForm() {
                   value={formData.password}
                   onChange={handleChange}
                   className="mt-1 w-full rounded-lg border border-gray-200 bg-off-white px-3 py-2.5 text-sm outline-none focus:border-pulse-primary focus:ring-1 focus:ring-pulse-primary"
-                  placeholder="At least 6 characters"
+                  placeholder="At least 12 characters"
                   required
                 />
               </label>
 
-              {error ? <p className="text-xs text-red-500">{error}</p> : null}
+              <label className="block text-sm font-medium text-gray-700">
+                Date of birth (18+ only)
+                <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} required className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:border-pulse-primary focus:ring-2 focus:ring-pulse-primary" />
+              </label>
+              {error ? <p role="alert" className="text-xs text-red-600">{error}</p> : null}
 
               <Button type="button" className="w-full bg-pulse-primary text-white hover:bg-rose-700" onClick={goToNextStep}>
                 Continue
@@ -187,6 +202,20 @@ function RegisterForm() {
                   <option value="female">Women</option>
                   <option value="everyone">Everyone</option>
                 </select>
+              </label>
+
+              <label className="block text-sm font-medium text-gray-700">
+                District (optional)
+                <select
+                  name="district"
+                  value={formData.district}
+                  onChange={handleChange}
+                  className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+                >
+                  <option value="">Anywhere in Sri Lanka or diaspora</option>
+                  {DISTRICTS.map((district) => <option key={district} value={district}>{district}</option>)}
+                </select>
+                <span className="mt-1 block text-xs font-normal text-gray-500">Only your district preference is used for discovery. No precise location is requested.</span>
               </label>
 
               <label className="block text-sm font-medium text-gray-700">

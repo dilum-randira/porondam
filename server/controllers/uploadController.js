@@ -12,6 +12,9 @@ const uploadProfileImage = async (req, res) => {
     }
 
     const imageUrl = req.file.path; // Cloudinary secure URL
+    if (typeof imageUrl !== 'string' || !imageUrl.startsWith('https://')) {
+      return res.status(502).json({ message: 'Image storage did not return a secure URL.' });
+    }
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
@@ -25,7 +28,7 @@ const uploadProfileImage = async (req, res) => {
 
     return res.json(updatedUser);
   } catch (error) {
-    console.error('Error uploading profile image:', error);
+    console.error('Profile image upload failed');
     return res.status(500).json({ message: 'Failed to upload image' });
   }
 };
