@@ -2,6 +2,14 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const districts = new Set([
+  'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo',
+  'Galle', 'Gampaha', 'Hambantota', 'Jaffna', 'Kalutara', 'Kandy',
+  'Kegalle', 'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale',
+  'Matara', 'Monaragala', 'Mullaitivu', 'Nuwara Eliya',
+  'Polonnaruwa', 'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya',
+]);
+
 const createToken = (userId) =>
   jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
@@ -16,13 +24,13 @@ const isAdult = (dateString) => {
 
 const publicUser = (user) => ({
   _id: user._id, name: user.name, email: user.email, bio: user.bio,
-  gender: user.gender, interestedIn: user.interestedIn, images: user.images,
+  gender: user.gender, interestedIn: user.interestedIn, district: user.district, images: user.images,
   token: createToken(user._id),
 });
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password, dateOfBirth, bio, gender, interestedIn } = req.body || {};
+    const { name, email, password, dateOfBirth, bio, gender, interestedIn, district } = req.body || {};
     if (typeof name !== 'string' || !name.trim() || name.length > 80 ||
         typeof email !== 'string' || email.length > 254 ||
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
@@ -41,6 +49,10 @@ const registerUser = async (req, res) => {
     if (interestedIn && !['male', 'female', 'everyone'].includes(interestedIn)) {
       return res.status(400).json({ message: 'Invalid preference.' });
     }
+    if (district !== undefined && district !== '' &&
+        (typeof district !== 'string' || !districts.has(district))) {
+      return res.status(400).json({ message: 'Select a valid Sri Lankan district or leave it blank.' });
+    }
     const normalizedEmail = email.trim().toLowerCase();
     if (await User.exists({ email: normalizedEmail })) {
       return res.status(409).json({ message: 'Unable to create account with this email.' });
@@ -49,6 +61,7 @@ const registerUser = async (req, res) => {
       name: name.trim(), email: normalizedEmail,
       password: await bcrypt.hash(password, 12), dateOfBirth,
       bio: bio || '', gender: gender || '', interestedIn: interestedIn || '',
+      district: district || '',
     });
     return res.status(201).json(publicUser(user));
   } catch (error) {
