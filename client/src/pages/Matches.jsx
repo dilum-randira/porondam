@@ -3,6 +3,7 @@ import { MessageCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosConfig';
+import Avatar from '../components/ui/Avatar';
 
 function Matches() {
   const [matches, setMatches] = useState([]);
@@ -69,11 +70,7 @@ function Matches() {
                 onClick={() => openChat(match)}
                 className="flex w-20 shrink-0 flex-col items-center gap-2"
               >
-                <img
-                  src={match.user.images?.[0] || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80'}
-                  alt={match.user.name}
-                  className="h-16 w-16 rounded-full border-2 border-romantic-secondary object-cover"
-                />
+                <Avatar name={match.user.name} src={match.user.images?.[0]} size="lg" />
                 <span className="w-full truncate text-xs font-medium text-gray-700">{match.user.name}</span>
               </button>
             ))
@@ -94,11 +91,7 @@ function Matches() {
                 onClick={() => openChat(match)}
                 className="flex w-full items-center gap-3 rounded-2xl border border-rose-100 bg-white p-3 text-left shadow-sm"
               >
-                <img
-                  src={match.user.images?.[0] || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80'}
-                  alt={match.user.name}
-                  className="h-12 w-12 rounded-full object-cover"
-                />
+                <Avatar name={match.user.name} src={match.user.images?.[0]} size="md" />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-romantic-accent">{match.user.name}</p>
                   <p className="truncate text-sm text-gray-600">{match.lastMessage}</p>
