@@ -62,3 +62,13 @@ Branch: `feature/2026-11-07-trust-ux` (based on previously unmerged security fou
 3. Enforce account eligibility and blocks across all routes and sockets; implement non-destructive legacy age re-confirmation.
 4. Implement real image-byte validation, secure private-photo controls, safe media handling and reporting.
 5. Replace local-only login throttling with a shared abuse-prevention strategy for production, and add accessibility and browser tests.
+
+## 2026-11-08 — adult discovery access hardening
+
+- Added a shared UTC adult-date eligibility helper and boundary tests (exactly 18, one day younger, invalid and missing birth dates).
+- Added server-side adult eligibility middleware to discovery feed and swipe routes. Legacy accounts without birth dates receive `AGE_CONFIRMATION_REQUIRED` instead of participating in new discovery; existing conversations are left intact.
+- Replaced database exception details in match endpoints with generic error responses.
+- Self-declared dates do not establish verified identity or age. There is no legacy age confirmation flow yet, so affected users cannot use discovery until one is built.
+- Connector edits only; local dependency installation, database integration, browser checks and build have not been executed here. CI and PR checks must be evaluated before merging.
+
+Next: build a secure self-service date-of-birth confirmation path for legacy accounts; add database-backed authorization tests, rate limits and private photo controls.
