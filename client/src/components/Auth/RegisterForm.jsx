@@ -2,7 +2,15 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import { useAuth } from '../../context/AuthContext';
-import { hasMinPasswordLength, isValidEmail } from '../../utils/validation';
+import { isValidEmail } from '../../utils/validation';
+
+const DISTRICTS = [
+  'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle',
+  'Gampaha', 'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle',
+  'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale', 'Matara',
+  'Monaragala', 'Mullaitivu', 'Nuwara Eliya', 'Polonnaruwa',
+  'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya',
+];
 
 const initialFormData = {
   name: '',
@@ -11,6 +19,7 @@ const initialFormData = {
   dateOfBirth: '',
   gender: '',
   interestedIn: '',
+  district: '',
   bio: '',
 };
 
@@ -87,14 +96,7 @@ function RegisterForm() {
 
     try {
       setIsSubmitting(true);
-      await register({
-        ...formData,
-        images: [],
-        location: {
-          type: 'Point',
-          coordinates: [0, 0],
-        },
-      });
+      await register(formData);
       navigate('/dashboard');
     } catch (err) {
       setError(err?.response?.data?.message || 'Unable to create account right now.');
@@ -200,6 +202,20 @@ function RegisterForm() {
                   <option value="female">Women</option>
                   <option value="everyone">Everyone</option>
                 </select>
+              </label>
+
+              <label className="block text-sm font-medium text-gray-700">
+                District (optional)
+                <select
+                  name="district"
+                  value={formData.district}
+                  onChange={handleChange}
+                  className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+                >
+                  <option value="">Anywhere in Sri Lanka or diaspora</option>
+                  {DISTRICTS.map((district) => <option key={district} value={district}>{district}</option>)}
+                </select>
+                <span className="mt-1 block text-xs font-normal text-gray-500">Only your district preference is used for discovery. No precise location is requested.</span>
               </label>
 
               <label className="block text-sm font-medium text-gray-700">
