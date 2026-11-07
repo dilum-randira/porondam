@@ -35,6 +35,8 @@ const userSchema = new mongoose.Schema(
       default: '',
       trim: true,
     },
+    // Coarse location preference; exact coordinates are legacy data only.
+    district: { type: String, default: '', trim: true },
     images: {
       type: [String],
       default: [],
