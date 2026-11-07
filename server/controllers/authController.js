@@ -2,97 +2,76 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const createToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+const createToken = (userId) =>
+  jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+const isAdult = (dateString) => {
+  if (typeof dateString !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return false;
+  const birth = new Date(dateString + 'T00:00:00.000Z');
+  if (!Number.isFinite(birth.getTime()) || birth.toISOString().slice(0, 10) !== dateString) return false;
+  const today = new Date();
+  const cutoff = new Date(Date.UTC(today.getUTCFullYear() - 18, today.getUTCMonth(), today.getUTCDate()));
+  return birth <= cutoff;
 };
+
+const publicUser = (user) => ({
+  _id: user._id, name: user.name, email: user.email, bio: user.bio,
+  gender: user.gender, interestedIn: user.interestedIn, images: user.images,
+  location: user.location, token: createToken(user._id),
+});
 
 const registerUser = async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      password,
-      bio,
-      gender,
-      interestedIn,
-      images,
-      location,
-    } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Name, email, and password are required.' });
+    const { name, email, password, dateOfBirth, bio, gender, interestedIn } = req.body || {};
+    if (typeof name !== 'string' || !name.trim() || name.length > 80 ||
+        typeof email !== 'string' || email.length > 254 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+        typeof password !== 'string' || password.length < 12 || password.length > 128) {
+      return res.status(400).json({ message: 'Provide a valid name, email and password (12–128 characters).' });
     }
-
-    const normalizedEmail = email.toLowerCase();
-    const existingUser = await User.findOne({ email: normalizedEmail });
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists.' });
+    if (!isAdult(dateOfBirth)) {
+      return res.status(400).json({ message: 'Porondam registration is for adults aged 18 or older.' });
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    if (typeof bio !== 'undefined' && (typeof bio !== 'string' || bio.length > 1000)) {
+      return res.status(400).json({ message: 'Bio must be at most 1000 characters.' });
+    }
+    if (gender && !['male', 'female', 'non-binary'].includes(gender)) {
+      return res.status(400).json({ message: 'Invalid gender selection.' });
+    }
+    if (interestedIn && !['male', 'female', 'everyone'].includes(interestedIn)) {
+      return res.status(400).json({ message: 'Invalid preference.' });
+    }
+    const normalizedEmail = email.trim().toLowerCase();
+    if (await User.exists({ email: normalizedEmail })) {
+      return res.status(409).json({ message: 'Unable to create account with this email.' });
+    }
     const user = await User.create({
-      name,
-      email: normalizedEmail,
-      password: hashedPassword,
-      bio,
-      gender,
-      interestedIn,
-      images,
-      location,
+      name: name.trim(), email: normalizedEmail,
+      password: await bcrypt.hash(password, 12), dateOfBirth,
+      bio: bio || '', gender: gender || '', interestedIn: interestedIn || '',
     });
-
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      bio: user.bio,
-      gender: user.gender,
-      interestedIn: user.interestedIn,
-      images: user.images,
-      location: user.location,
-      token: createToken(user._id),
-    });
+    return res.status(201).json(publicUser(user));
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    if (error.code === 11000) return res.status(409).json({ message: 'Unable to create account with this email.' });
+    return res.status(500).json({ message: 'Unable to create account.' });
   }
 };
 
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
+    const { email, password } = req.body || {};
+    if (typeof email !== 'string' || typeof password !== 'string' ||
+        email.length > 254 || password.length > 128 || !email || !password) {
       return res.status(400).json({ message: 'Email and password are required.' });
     }
-
-    const user = await User.findOne({ email: email.toLowerCase() });
-    if (!user) {
+    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials.' });
-    }
-
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      bio: user.bio,
-      gender: user.gender,
-      interestedIn: user.interestedIn,
-      images: user.images,
-      location: user.location,
-      token: createToken(user._id),
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.json(publicUser(user));
+  } catch {
+    return res.status(500).json({ message: 'Unable to sign in.' });
   }
 };
 
-module.exports = {
-  registerUser,
-  loginUser,
-};
+module.exports = { registerUser, loginUser };
