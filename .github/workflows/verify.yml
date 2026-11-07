@@ -20,6 +20,9 @@ jobs:
         run: |
           npm ci
           find . -path './node_modules' -prune -o -name '*.js' -type f -print0 | xargs -0 -n1 node --check
+      - name: Run backend tests
+        working-directory: server
+        run: npm test
       - name: Build client
         working-directory: client
         run: |
