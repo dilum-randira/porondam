@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const Match = require('../models/Match');
 const Message = require('../models/Message');
 const User = require('../models/User');
@@ -7,94 +8,63 @@ const registerSocketHandlers = (io) => {
   io.use(async (socket, next) => {
     try {
       const token = socket.handshake.auth?.token;
-
-      if (!token) {
-        return next(new Error('Unauthorized'));
-      }
-
+      if (typeof token !== 'string' || !token) return next(new Error('Unauthorized'));
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const user = await User.findById(decoded.userId).select('_id name images');
-
-      if (!user) {
-        return next(new Error('Unauthorized'));
-      }
-
+      if (!user) return next(new Error('Unauthorized'));
       socket.user = user;
       return next();
-    } catch (error) {
+    } catch {
       return next(new Error('Unauthorized'));
     }
   });
 
   io.on('connection', (socket) => {
-    socket.on('setup', (userData) => {
-      const roomId = userData?._id || String(socket.user._id);
-      socket.join(roomId);
+    // Never trust a client-provided user ID for room membership.
+    socket.join(String(socket.user._id));
+
+    socket.on('setup', () => {
+      socket.join(String(socket.user._id));
     });
 
     socket.on('join chat', async (matchId) => {
-      const match = await Match.findById(matchId).select('participants');
-      if (!match) {
-        return;
+      try {
+        if (typeof matchId !== 'string' || !mongoose.isValidObjectId(matchId)) return;
+        const match = await Match.findById(matchId).select('participants');
+        if (!match || !match.participants.some(id => String(id) === String(socket.user._id))) return;
+        socket.join(String(matchId));
+      } catch {
+        socket.emit('chat error', { message: 'Unable to join conversation.' });
       }
-
-      const isParticipant = match.participants.some(
-        (participantId) => String(participantId) === String(socket.user._id)
-      );
-
-      if (!isParticipant) {
-        return;
-      }
-
-      socket.join(String(matchId));
     });
 
     socket.on('new message', async (payload) => {
-      const { matchId, content } = payload || {};
-
-      if (!matchId || !content || !String(content).trim()) {
-        return;
+      try {
+        const { matchId, content } = payload || {};
+        if (typeof matchId !== 'string' || !mongoose.isValidObjectId(matchId)) return;
+        if (typeof content !== 'string' || !content.trim() || content.length > 2000) return;
+        const match = await Match.findById(matchId).select('participants');
+        if (!match) return;
+        const senderId = String(socket.user._id);
+        if (!match.participants.some(id => String(id) === senderId)) return;
+        const receiverId = match.participants.map(String).find(id => id !== senderId);
+        if (!receiverId) return;
+        const message = await Message.create({
+          sender: senderId,
+          receiver: receiverId,
+          matchId,
+          content: content.trim(),
+        });
+        await Match.findByIdAndUpdate(matchId, {
+          lastMessage: message.content,
+          lastMessageAt: message.createdAt,
+        });
+        io.to(String(matchId)).emit('message received', message);
+      } catch {
+        socket.emit('chat error', { message: 'Unable to send message.' });
       }
-
-      const match = await Match.findById(matchId).select('participants');
-      if (!match) {
-        return;
-      }
-
-      const senderId = String(socket.user._id);
-      const isParticipant = match.participants.some(
-        (participantId) => String(participantId) === senderId
-      );
-
-      if (!isParticipant) {
-        return;
-      }
-
-      const receiverId = match.participants
-        .map((participantId) => String(participantId))
-        .find((participantId) => participantId !== senderId);
-
-      if (!receiverId) {
-        return;
-      }
-
-      const message = await Message.create({
-        sender: senderId,
-        receiver: receiverId,
-        matchId,
-        content: String(content).trim(),
-      });
-
-      await Match.findByIdAndUpdate(matchId, {
-        lastMessage: message.content,
-        lastMessageAt: message.createdAt,
-      });
-
-      io.to(String(matchId)).emit('message received', message);
     });
   });
 };
 
-module.exports = {
-  registerSocketHandlers,
-};
+module.exports = { registerSocketHandlers };
