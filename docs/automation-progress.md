@@ -26,3 +26,13 @@ Reviewed code through GitHub connector and checked changed file contents prior t
 
 ### Operational note
 CLIENT_ORIGIN supports comma-separated allowed origins; configure it explicitly in deployment. Never commit secrets. Do not claim production-ready adult verification: a self-entered date is only an eligibility declaration.
+
+## 2026-11-07 — follow-up security and CI pass
+
+- Removed exact coordinates from authentication and discovery responses (stored coordinates remain; a district-level replacement is pending).
+- Reject malformed swipe and message-history identifiers; cap each history response at 100 newest messages, returned chronologically. Older-message pagination is still needed.
+- Restrict image upload MIME/extension allowlist to JPEG/PNG and require secure storage URLs; this is **not** content-byte verification or private-photo authorization. New uploads use the porondam_profiles Cloudinary folder; existing assets are not moved.
+- Avoid logging raw upload exceptions. Added GitHub Actions checks for server JS syntax and client build.
+- Connector-only review: no local npm install, build, browser, MongoDB integration, security scan or runtime tests were executed. CI outcome must be checked before merging. No production readiness claim.
+
+Next: check CI and PR mergeability; test existing login/registration/chat/upload behavior end-to-end; add actual file signature validation, auth rate limits, and private-photo access controls. Existing photo URLs may still be publicly accessible.
