@@ -42,7 +42,7 @@ const getFeed = async (req, res) => {
     }
 
     const users = await User.find(feedFilter)
-      .select('name bio gender interestedIn images location')
+      .select('name bio gender interestedIn images')
       .limit(25);
 
     return res.json(users);
@@ -55,7 +55,7 @@ const swipe = async (req, res) => {
   try {
     const { targetUserId, action } = req.body;
 
-    if (!targetUserId || !action) {
+    if (!mongoose.isValidObjectId(targetUserId) || !action) {
       return res.status(400).json({ message: 'targetUserId and action are required.' });
     }
 
