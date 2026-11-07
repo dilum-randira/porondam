@@ -37,7 +37,7 @@ const getFeed = async (req, res) => {
 
     return res.json(users);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: 'Unable to process matchmaking request.' });
   }
 };
 
@@ -114,7 +114,7 @@ const swipe = async (req, res) => {
 
     return res.json({ success: true, match: isMatch, matchId: matchedConversationId });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: 'Unable to process matchmaking request.' });
   }
 };
 
@@ -149,7 +149,7 @@ const getMatches = async (req, res) => {
 
     return res.json(response.filter((item) => item.user));
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: 'Unable to process matchmaking request.' });
   }
 };
 
