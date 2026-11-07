@@ -5,6 +5,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import api from '../api/axiosConfig';
 import { connectSocket, getSocket } from '../api/socket';
 import { useAuth } from '../context/AuthContext';
+import Avatar from '../components/ui/Avatar';
 
 function Chat() {
   const { matchId } = useParams();
@@ -86,9 +87,7 @@ function Chat() {
   };
 
   const title = useMemo(() => matchInfo?.user?.name || 'Conversation', [matchInfo]);
-  const avatar =
-    matchInfo?.user?.images?.[0] ||
-    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80';
+  const avatar = matchInfo?.user?.images?.[0] || null;
 
   return (
     <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-md flex-col rounded-3xl border border-rose-100 bg-white shadow-sm">
@@ -96,11 +95,11 @@ function Chat() {
         <button type="button" onClick={() => navigate('/matches')} className="text-gray-600" aria-label="Back">
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <img src={avatar} alt={title} className="h-9 w-9 rounded-full object-cover" />
+        <Avatar name={title} src={avatar} size="sm" />
         <p className="font-semibold text-romantic-accent">{title}</p>
       </header>
 
-      {error ? <p className="mx-4 mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
+      {error ? <p role="alert" className="mx-4 mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
 
       <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
         {isLoading ? (
@@ -125,7 +124,7 @@ function Chat() {
             );
           })
         ) : (
-          <p className="text-sm text-gray-500">No messages yet. Say hi 👋</p>
+          <p className="text-sm text-gray-500">No messages yet. Start a conversation when you feel ready.</p>
         )}
       </div>
 
@@ -141,7 +140,9 @@ function Chat() {
               }
             }}
             type="text"
-            placeholder="Type a message"
+            placeholder="Write a respectful message"
+            maxLength={2000}
+            aria-label="Your message"
             className="w-full rounded-full border border-rose-200 px-4 py-2 text-sm outline-none focus:border-romantic-primary"
           />
           <button
