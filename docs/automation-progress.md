@@ -36,3 +36,29 @@ CLIENT_ORIGIN supports comma-separated allowed origins; configure it explicitly 
 - Connector-only review: no local npm install, build, browser, MongoDB integration, security scan or runtime tests were executed. CI outcome must be checked before merging. No production readiness claim.
 
 Next: check CI and PR mergeability; test existing login/registration/chat/upload behavior end-to-end; add actual file signature validation, auth rate limits, and private-photo access controls. Existing photo URLs may still be publicly accessible.
+
+
+## 2026-11-07 — trust, privacy and first visual identity
+
+Branch: `feature/2026-11-07-trust-ux` (based on previously unmerged security foundation).
+
+### Delivered on this branch
+- Added bounded process-local IP throttling: five registration attempts and ten sign-in attempts per 15-minute window, with `Retry-After`; added five isolated Node test cases and an `npm test` script.
+- Changed discovery to an optional district preference, avoiding the old `$near` query and registration's placeholder coordinates. Existing precise location fields are preserved to avoid destructive migrations; existing users without district can search broadly. **No automatic precise-coordinate deletion has been performed.**
+- Discovery and new swipes target only accounts with a recorded self-declared adult birth date. Legacy profiles without birth dates need a consent-first eligibility migration; existing conversations are not automatically deleted.
+- Built a new Porondam landing page with accurate early-stage language, Sri Lankan identity, mobile-aware navigation and no unverified claims of verification or matching accuracy.
+- Removed nonfunctional Google and recovery buttons, and misleading stock-face placeholders from matches/chat; replaced missing photos with accessible initial avatars.
+- Added optional frontend `VITE_API_URL` and `VITE_SOCKET_URL` configuration, documented setup, and added backend tests to CI.
+
+### Verification and limitations
+- This run used remote GitHub file inspection and commits. Local git clone was blocked by network DNS restrictions; no installed-dependency build, browser visual test, authenticated API integration test, or database integration test has been completed locally.
+- GitHub Actions workflow checks build, syntax and initial throttling unit tests when a PR opens. Its actual result and mergeability must be checked, not assumed.
+- Process-local IP throttling has memory and deployment limitations. Socket messages still need dedicated rate limits. Uploaded assets may still be public. Account blocking, reporting and moderation are still missing. UI redesign needs mobile and desktop screenshot review.
+- The site is **not production ready** and should not collect sensitive personal information.
+
+### Next priorities
+1. Verify PR CI, investigate any failure and merge only if safe; verify remote `main`.
+2. Run real registration/login/discovery/chat/upload tests with a disposable database and browser at desktop/mobile widths.
+3. Enforce account eligibility and blocks across all routes and sockets; implement non-destructive legacy age re-confirmation.
+4. Implement real image-byte validation, secure private-photo controls, safe media handling and reporting.
+5. Replace local-only login throttling with a shared abuse-prevention strategy for production, and add accessibility and browser tests.
