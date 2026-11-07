@@ -15,32 +15,41 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('Origin not allowed by CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+};
 
 const io = new Server(server, {
-  cors: {
-    origin: [CLIENT_ORIGIN, 'http://localhost:5174'],
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
+  cors: { origin: allowedOrigins, methods: ['GET', 'POST'], credentials: false },
+  maxHttpBufferSize: 64 * 1024,
 });
 
-app.use(cors());
-app.use(express.json());
+app.disable('x-powered-by');
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '32kb' }));
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('X-Frame-Options', 'DENY');
+  next();
+});
 
 connectDB();
-
 app.use('/api/auth', authRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/upload', uploadRoutes);
 
-app.get('/', (req, res) => {
-  res.send('Pulse API is running');
-});
+app.get('/', (req, res) => res.send('Porondam API is running'));
 
 registerSocketHandlers(io);
-
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
