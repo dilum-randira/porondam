@@ -34,3 +34,7 @@ The API restricts browser origins via `CLIENT_ORIGIN`, limits JSON request bodie
 6. Optional porondam guidance with clear limitations.
 
 For the latest daily work and blockers, see `docs/automation-progress.md`. Deployment is not yet documented or approved as production-safe.
+
+
+### Legacy-account discovery eligibility
+Discovery feed and swipes require an authenticated account with a stored self-declared adult date of birth. Older accounts missing this field receive HTTP 403 with `AGE_CONFIRMATION_REQUIRED`. No self-service migration exists yet; historical conversations are retained. This is an eligibility declaration, **not** proof of identity or age. The server test suite includes UTC age-boundary cases.
