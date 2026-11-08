@@ -37,4 +37,7 @@ For the latest daily work and blockers, see `docs/automation-progress.md`. Deplo
 
 
 ### Legacy-account discovery eligibility
-Discovery feed and swipes require an authenticated account with a stored self-declared adult date of birth. Older accounts missing this field receive HTTP 403 with `AGE_CONFIRMATION_REQUIRED`. No self-service migration exists yet; historical conversations are retained. This is an eligibility declaration, **not** proof of identity or age. The server test suite includes UTC age-boundary cases.
+Discovery feed and swipes require an authenticated account with a stored self-declared adult date of birth. Older accounts missing this field receive HTTP 403 with `AGE_CONFIRMATION_REQUIRED`. A password-confirmed self-service declaration is available on the profile page for legacy accounts. Historical conversations are retained. This is an eligibility declaration, **not** proof of identity or age. The server test suite includes UTC age-boundary cases.
+
+### Legacy adult declaration (in development)
+Authenticated accounts without a recorded date of birth can submit their current password and an adult birth date through Profile. The API route is `POST /api/auth/confirm-adult`; it is process-locally rate limited, refuses to overwrite an existing birth date, and updates only the authenticated account. The profile page reflects eligibility after success. This is **self-declared**, not documentary age verification. Existing accounts may need to sign out and back in to refresh previously cached eligibility. Browser and database integration testing remain outstanding.
