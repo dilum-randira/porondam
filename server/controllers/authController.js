@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { isAdultBirthDate } = require('../utils/adultEligibility');
 
 const districts = new Set([
   'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo',
@@ -25,6 +26,7 @@ const isAdult = (dateString) => {
 const publicUser = (user) => ({
   _id: user._id, name: user.name, email: user.email, bio: user.bio,
   gender: user.gender, interestedIn: user.interestedIn, district: user.district, images: user.images,
+  adultEligible: isAdultBirthDate(user.dateOfBirth),
   token: createToken(user._id),
 });
 
@@ -77,7 +79,7 @@ const loginUser = async (req, res) => {
         email.length > 254 || password.length > 128 || !email || !password) {
       return res.status(400).json({ message: 'Email and password are required.' });
     }
-    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+dateOfBirth');
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
