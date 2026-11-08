@@ -72,3 +72,13 @@ Branch: `feature/2026-11-07-trust-ux` (based on previously unmerged security fou
 - Connector edits only; local dependency installation, database integration, browser checks and build have not been executed here. CI and PR checks must be evaluated before merging.
 
 Next: build a secure self-service date-of-birth confirmation path for legacy accounts; add database-backed authorization tests, rate limits and private photo controls.
+
+## 2026-11-09 — legacy adult self-declaration
+
+- Authentication payloads now report adult eligibility accurately, including for legacy logins (birth dates remain private).
+- Added a password-reconfirmed, authenticated, process-locally throttled one-time DOB declaration endpoint. An atomic conditional update prevents replacing an existing DOB, including concurrent requests.
+- Added a responsive profile form with status feedback and a clear distinction between self-declaration and verification.
+- Existing conversations and legacy location data were not changed.
+
+### Verification / limitations
+GitHub connector source inspection and branch commits performed. Local Node dependencies, browser, MongoDB and integration test environment were unavailable in this execution. GitHub Actions results must be checked before merging; no runtime validation is claimed here. A process-local limiter does not protect multiple replicas; self-reported age is not verified; an account already holding a DOB cannot edit it through this endpoint. Next: integration tests for unauthorized/underage/concurrent submissions, rate-limit and auth boundary, and browser review at mobile and desktop widths. Continue blocking/reporting and private-photo authorization work.
