@@ -1,8 +1,29 @@
+import { useState } from 'react';
+import api from '../api/axiosConfig';
 import ImageUpload from '../components/profile/ImageUpload';
 import { useAuth } from '../context/AuthContext';
 
 function Profile() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
+  const [birthDate, setBirthDate] = useState('');
+  const [password, setPassword] = useState('');
+  const [status, setStatus] = useState('');
+  const [saving, setSaving] = useState(false);
+  const confirmAdult = async (event) => {
+    event.preventDefault();
+    setSaving(true);
+    setStatus('');
+    try {
+      await api.post('/auth/confirm-adult', { dateOfBirth: birthDate, password });
+      updateUser({ ...user, adultEligible: true });
+      setPassword('');
+      setStatus('Your adult eligibility declaration has been recorded.');
+    } catch (error) {
+      setStatus(error.response?.data?.message || 'Unable to save. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (!user) {
     return null;
@@ -34,6 +55,20 @@ function Profile() {
         </div>
       </div>
 
+      {user.adultEligible === false && (
+        <section className="rounded-xl border border-rose-200 bg-white p-5 space-y-3" aria-labelledby="eligibility-title">
+          <h2 id="eligibility-title" className="text-lg font-semibold">Confirm adult eligibility</h2>
+          <p className="text-sm">To use discovery, confirm that you are at least 18. This is a self-declaration, not identity verification. Your birth date is not shown on your public profile.</p>
+          <form onSubmit={confirmAdult} className="space-y-3">
+            <label className="block text-sm" htmlFor="birth-date">Date of birth</label>
+            <input id="birth-date" className="w-full rounded-lg border p-3" type="date" required value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+            <label className="block text-sm" htmlFor="confirm-password">Current password</label>
+            <input id="confirm-password" className="w-full rounded-lg border p-3" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <button className="rounded-lg bg-rose-800 px-5 py-3 text-white disabled:opacity-50" disabled={saving} type="submit">{saving ? 'Saving…' : 'Confirm eligibility'}</button>
+          </form>
+          <p role="status" aria-live="polite" className="text-sm">{status}</p>
+        </section>
+      )}
       <section className="space-y-3">
         <h2 className="text-sm font-medium text-romantic-muted uppercase tracking-wide">
           Photos
