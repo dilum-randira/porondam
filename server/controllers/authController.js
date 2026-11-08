@@ -89,4 +89,29 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+// One-time self-declaration for pre-existing accounts. Never overwrite a recorded DOB.
+const confirmLegacyAdult = async (req, res) => {
+  try {
+    const { password, dateOfBirth } = req.body || {};
+    if (typeof password !== 'string' || !password || password.length > 128 || !isAdult(dateOfBirth)) {
+      return res.status(400).json({ message: 'A valid adult birth date and current password are required.' });
+    }
+    const account = await User.findById(req.user._id).select('+password +dateOfBirth');
+    if (!account) return res.status(401).json({ message: 'Account not found.' });
+    if (account.dateOfBirth) return res.status(409).json({ code: 'BIRTH_DATE_ALREADY_SET', message: 'Birth date is already recorded.' });
+    if (!(await bcrypt.compare(password, account.password))) {
+      return res.status(401).json({ message: 'Unable to confirm credentials.' });
+    }
+    const updated = await User.findOneAndUpdate(
+      { _id: account._id, $or: [{ dateOfBirth: null }, { dateOfBirth: { $exists: false } }] },
+      { $set: { dateOfBirth: new Date(dateOfBirth + 'T00:00:00.000Z') } },
+      { new: true }
+    ).select('+dateOfBirth');
+    if (!updated) return res.status(409).json({ code: 'BIRTH_DATE_ALREADY_SET', message: 'Birth date is already recorded.' });
+    return res.json({ adultEligible: true, message: 'Adult eligibility declaration recorded.' });
+  } catch {
+    return res.status(500).json({ message: 'Unable to update eligibility.' });
+  }
+};
+
+module.exports = { registerUser, loginUser, confirmLegacyAdult };
