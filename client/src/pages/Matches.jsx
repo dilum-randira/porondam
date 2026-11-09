@@ -38,6 +38,17 @@ function Matches() {
     [matches]
   );
 
+  const blockMatch = async (match) => {
+    if (!window.confirm(`Block ${match.user.name}? You will no longer see or message each other.`)) return;
+    try {
+      setError('');
+      await api.put(`/blocks/${match.user._id}`);
+      setMatches((previous) => previous.filter((item) => item.user._id !== match.user._id));
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Unable to block this account.');
+    }
+  };
+
   const openChat = (match) => {
     navigate(`/chat/${match._id}`, { state: { match } });
   };
@@ -85,12 +96,8 @@ function Matches() {
         <div className="mt-3 space-y-3">
           {recentConversations.length ? (
             recentConversations.map((match) => (
-              <button
-                key={match._id}
-                type="button"
-                onClick={() => openChat(match)}
-                className="flex w-full items-center gap-3 rounded-2xl border border-rose-100 bg-white p-3 text-left shadow-sm"
-              >
+              <div key={match._id} className="flex items-center gap-2 rounded-2xl border border-rose-100 bg-white p-3 shadow-sm">
+                <button type="button" onClick={() => openChat(match)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
                 <Avatar name={match.user.name} src={match.user.images?.[0]} size="md" />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-romantic-accent">{match.user.name}</p>
@@ -101,7 +108,13 @@ function Matches() {
                     ? formatDistanceToNow(new Date(match.lastMessageAt), { addSuffix: true })
                     : ''}
                 </span>
-              </button>
+                </button>
+                <button type="button" onClick={() => blockMatch(match)}
+                  aria-label={`Block ${match.user.name}`}
+                  className="shrink-0 rounded-lg border border-rose-200 px-3 py-2 text-xs font-medium text-rose-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+                  Block
+                </button>
+              </div>
             ))
           ) : (
             <div className="rounded-2xl border border-rose-100 bg-white p-6 text-center text-sm text-gray-600 shadow-sm">
