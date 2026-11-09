@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Match = require('../models/Match');
 const Message = require('../models/Message');
+const { isBlockedEitherWay } = require('../utils/blockAccess');
 
 const getMessagesForMatch = async (req, res) => {
   try {
@@ -21,6 +22,11 @@ const getMessagesForMatch = async (req, res) => {
       return res.status(403).json({ message: 'You are not allowed to access this chat.' });
     }
 
+    const otherUser = match.participants.map(String).find(id => id !== currentUserId);
+    if (!otherUser || await isBlockedEitherWay(currentUserId, otherUser)) {
+      return res.status(403).json({ message: 'Conversation unavailable.' });
+    }
+
     const messages = await Message.find({ matchId })
       .sort({ createdAt: -1 })
       .limit(100)
@@ -28,7 +34,7 @@ const getMessagesForMatch = async (req, res) => {
 
     return res.json(messages.reverse());
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: 'Unable to load conversation.' });
   }
 };
 
