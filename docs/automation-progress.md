@@ -82,3 +82,11 @@ Next: build a secure self-service date-of-birth confirmation path for legacy acc
 
 ### Verification / limitations
 GitHub connector source inspection and branch commits performed. Local Node dependencies, browser, MongoDB and integration test environment were unavailable in this execution. GitHub Actions results must be checked before merging; no runtime validation is claimed here. A process-local limiter does not protect multiple replicas; self-reported age is not verified; an account already holding a DOB cannot edit it through this endpoint. Next: integration tests for unauthorized/underage/concurrent submissions, rate-limit and auth boundary, and browser review at mobile and desktop widths. Continue blocking/reporting and private-photo authorization work.
+
+## 2026-11-10 — blocking foundation
+
+- Added unique indexed directional Block records, protected block/list/unblock API and reciprocal block lookup helpers.
+- Filtered blocked users out of discovery and match lists; rejected new swipes and conversation history when either party blocks the other.
+- Denied new socket chat joins and messages for blocked pairs; added a Block action to recent conversations.
+- Historical records are retained. **Important limitation:** users already joined to socket match rooms can potentially receive a message broadcast to that room after a block, because Socket.IO room membership is not yet revoked and the broadcast currently targets the match room. Do not launch this as complete block protection.
+- Follow-up priorities: deliver messages only to currently authorized recipients, add database-backed block authorization tests and browser checks, add unblock UI, report flow, and privacy audit. Verify CI before merging; local database and browser checks were not performed by the GitHub connector.
