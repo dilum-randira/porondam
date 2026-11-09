@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Interaction = require('../models/Interaction');
 const Match = require('../models/Match');
 const User = require('../models/User');
+const { excludedUserIds, isBlockedEitherWay } = require('../utils/blockAccess');
 
 const getFeed = async (req, res) => {
   try {
@@ -19,8 +20,9 @@ const getFeed = async (req, res) => {
     ));
     const interactions = await Interaction.find({ user: currentUser._id }).select('targetUser');
     const swipedUserIds = interactions.map((item) => item.targetUser);
+    const blockedIds = await excludedUserIds(currentUser._id);
     const feedFilter = {
-      _id: { $nin: [currentUser._id, ...swipedUserIds] },
+      _id: { $nin: [currentUser._id, ...swipedUserIds, ...blockedIds] },
       dateOfBirth: { $lte: adultCutoff },
     };
 
@@ -67,6 +69,10 @@ const swipe = async (req, res) => {
     });
     if (!targetUserExists) {
       return res.status(404).json({ message: 'Target user not found.' });
+    }
+
+    if (await isBlockedEitherWay(req.user._id, targetUserId)) {
+      return res.status(403).json({ message: 'This account is not available for matching.' });
     }
 
     await Interaction.findOneAndUpdate(
@@ -122,6 +128,7 @@ const getMatches = async (req, res) => {
   try {
     const currentUserId = String(req.user._id);
 
+    const blockedIds = new Set((await excludedUserIds(req.user._id)).map(String));
     const matches = await Match.find({ participants: req.user._id })
       .populate('participants', 'name images bio')
       .sort({ lastMessageAt: -1, createdAt: -1 });
@@ -147,7 +154,7 @@ const getMatches = async (req, res) => {
       };
     });
 
-    return res.json(response.filter((item) => item.user));
+    return res.json(response.filter((item) => item.user && !blockedIds.has(String(item.user._id))));
   } catch (error) {
     return res.status(500).json({ message: 'Unable to process matchmaking request.' });
   }

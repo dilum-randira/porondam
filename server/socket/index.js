@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Match = require('../models/Match');
 const Message = require('../models/Message');
 const User = require('../models/User');
+const { isBlockedEitherWay } = require('../utils/blockAccess');
 
 const registerSocketHandlers = (io) => {
   io.use(async (socket, next) => {
@@ -32,6 +33,8 @@ const registerSocketHandlers = (io) => {
         if (typeof matchId !== 'string' || !mongoose.isValidObjectId(matchId)) return;
         const match = await Match.findById(matchId).select('participants');
         if (!match || !match.participants.some(id => String(id) === String(socket.user._id))) return;
+        const other = match.participants.map(String).find(id => id !== String(socket.user._id));
+        if (!other || await isBlockedEitherWay(socket.user._id, other)) return;
         socket.join(String(matchId));
       } catch {
         socket.emit('chat error', { message: 'Unable to join conversation.' });
@@ -48,7 +51,10 @@ const registerSocketHandlers = (io) => {
         const senderId = String(socket.user._id);
         if (!match.participants.some(id => String(id) === senderId)) return;
         const receiverId = match.participants.map(String).find(id => id !== senderId);
-        if (!receiverId) return;
+        if (!receiverId || await isBlockedEitherWay(senderId, receiverId)) {
+          socket.emit('chat error', { message: 'Conversation unavailable.' });
+          return;
+        }
         const message = await Message.create({
           sender: senderId,
           receiver: receiverId,
@@ -59,7 +65,9 @@ const registerSocketHandlers = (io) => {
           lastMessage: message.content,
           lastMessageAt: message.createdAt,
         });
-        io.to(String(matchId)).emit('message received', message);
+        // User rooms are bound to authenticated identity. Never broadcast to stale
+        // match rooms: a user may have blocked their counterpart after joining.
+        io.to(senderId).to(receiverId).emit('message received', message);
       } catch {
         socket.emit('chat error', { message: 'Unable to send message.' });
       }

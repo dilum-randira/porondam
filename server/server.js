@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const matchRoutes = require('./routes/matchRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const blockRoutes = require('./routes/blockRoutes');
 const { registerSocketHandlers } = require('./socket');
 
 dotenv.config();
@@ -48,6 +49,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/blocks', blockRoutes);
 
 app.get('/', (req, res) => res.send('Porondam API is running'));
 
