@@ -65,7 +65,9 @@ const registerSocketHandlers = (io) => {
           lastMessage: message.content,
           lastMessageAt: message.createdAt,
         });
-        io.to(String(matchId)).emit('message received', message);
+        // User rooms are bound to authenticated identity. Never broadcast to stale
+        // match rooms: a user may have blocked their counterpart after joining.
+        io.to(senderId).to(receiverId).emit('message received', message);
       } catch {
         socket.emit('chat error', { message: 'Unable to send message.' });
       }
