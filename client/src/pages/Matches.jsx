@@ -75,15 +75,17 @@ function Matches() {
         <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
           {newMatches.length ? (
             newMatches.map((match) => (
+              <div key={match._id} className="flex w-24 shrink-0 flex-col items-center gap-1">
               <button
-                key={match._id}
                 type="button"
                 onClick={() => openChat(match)}
-                className="flex w-20 shrink-0 flex-col items-center gap-2"
+                className="flex w-20 shrink-0 flex-col items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 <Avatar name={match.user.name} src={match.user.images?.[0]} size="lg" />
                 <span className="w-full truncate text-xs font-medium text-gray-700">{match.user.name}</span>
               </button>
+              <button type="button" onClick={() => blockMatch(match)} className="rounded-lg px-2 py-1 text-xs text-rose-800 underline underline-offset-2 focus-visible:outline focus-visible:outline-2" aria-label={`Block ${match.user.name}`}>Block</button>
+              </div>
             ))
           ) : (
             <p className="text-sm text-gray-500">No new matches yet.</p>
