@@ -90,3 +90,15 @@ GitHub connector source inspection and branch commits performed. Local Node depe
 - Denied new socket chat joins and messages for blocked pairs; added a Block action to recent conversations.
 - Historical records are retained. New messages broadcast to authenticated user rooms only after checking blocks, not previously joined match rooms. Concurrency races and real database/socket behavior still require integration testing.
 - Follow-up priorities: deliver messages only to currently authorized recipients, add database-backed block authorization tests and browser checks, add unblock UI, report flow, and privacy audit. Verify CI before merging; local database and browser checks were not performed by the GitHub connector.
+
+
+## 2026-11-11 — blocked account management
+
+- Added a Block control to new matches, not only recent conversations.
+- Added a self-service blocked-account list and confirmation-based Unblock action on Matches, backed by existing authenticated block endpoints.
+- Added disabled controls during pending mutations, accessible success/error feedback and a refresh after blocking while the manager is open.
+- Disclosed the server's 100-most-recent-blocks limit in the interface. Older records need pagination before all blocks can be managed.
+- No change to block authorization, message storage or existing user data. Unblocking does not restore matches.
+
+### Validation and remaining work
+Changes were made through the GitHub connector. Local browser rendering, MongoDB-backed tests, and full user-journey checks were not available in this execution. Verify GitHub Actions build/tests and merge status separately; do not treat a successful build as browser or database validation. Next: add pagination for blocked records, report/moderation flows, database-backed reciprocal authorization tests, mobile and desktop visual review, and socket race-condition tests.
