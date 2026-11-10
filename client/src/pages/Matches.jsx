@@ -7,6 +7,9 @@ import Avatar from '../components/ui/Avatar';
 
 function Matches() {
   const [matches, setMatches] = useState([]);
+  const [blockedAccounts, setBlockedAccounts] = useState([]);
+  const [showBlocked, setShowBlocked] = useState(false);
+  const [blockedLoading, setBlockedLoading] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -49,6 +52,31 @@ function Matches() {
     }
   };
 
+  const loadBlocked = async () => {
+    setBlockedLoading(true);
+    setError('');
+    try {
+      const response = await api.get('/blocks');
+      setBlockedAccounts(Array.isArray(response.data) ? response.data : []);
+      setShowBlocked(true);
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Unable to load blocked accounts.');
+    } finally {
+      setBlockedLoading(false);
+    }
+  };
+
+  const unblockAccount = async (account) => {
+    if (!window.confirm(`Unblock ${account.name}? They may appear in discovery again.`)) return;
+    try {
+      setError('');
+      await api.delete(`/blocks/${account.userId}`);
+      setBlockedAccounts((previous) => previous.filter((item) => item.userId !== account.userId));
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Unable to unblock this account.');
+    }
+  };
+
   const openChat = (match) => {
     navigate(`/chat/${match._id}`, { state: { match } });
   };
@@ -68,6 +96,30 @@ function Matches() {
       <div>
         <h1 className="text-2xl font-bold text-romantic-accent">Matches</h1>
         <p className="mt-1 text-sm text-gray-600">See who’s new and continue your conversations.</p>
+      </div>
+
+      <div className="rounded-2xl border border-rose-100 bg-white p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-semibold text-romantic-accent">Blocked accounts</h2>
+            <p className="text-sm text-gray-600">Review accounts you blocked. Unblocking does not restore a match or conversation.</p>
+          </div>
+          <button type="button" onClick={() => showBlocked ? setShowBlocked(false) : loadBlocked()}
+            disabled={blockedLoading} aria-expanded={showBlocked} aria-controls="blocked-accounts"
+            className="rounded-lg border border-rose-200 px-4 py-2 text-sm font-medium text-rose-800 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+            {blockedLoading ? 'Loading...' : showBlocked ? 'Hide blocked accounts' : 'Manage blocked accounts'}
+          </button>
+        </div>
+        {showBlocked && <div id="blocked-accounts" className="mt-4 space-y-2" aria-live="polite">
+          {blockedAccounts.length === 0 ? <p className="text-sm text-gray-600">No blocked accounts to display.</p> :
+            blockedAccounts.map((account) => <div key={account.userId} className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 p-3">
+              <span className="min-w-0 break-words text-sm font-medium text-gray-800">{account.name || 'Account'}</span>
+              <button type="button" onClick={() => unblockAccount(account)}
+                className="shrink-0 rounded-lg border border-gray-300 px-3 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+                Unblock
+              </button>
+            </div>)}
+        </div>}
       </div>
 
       <div>
