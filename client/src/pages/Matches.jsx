@@ -53,6 +53,7 @@ function Matches() {
       await api.put(`/blocks/${match.user._id}`);
       setMatches((previous) => previous.filter((item) => item.user._id !== match.user._id));
       setNotice('Account blocked. You can manage blocked accounts below.');
+      if (showBlocked) await loadBlocked();
     } catch (err) {
       setError(err?.response?.data?.message || 'Unable to block this account.');
     } finally {
@@ -125,12 +126,13 @@ function Matches() {
             {blockedLoading ? 'Loading...' : showBlocked ? 'Hide blocked accounts' : 'Manage blocked accounts'}
           </button>
         </div>
-        {showBlocked && <div id="blocked-accounts" className="mt-4 space-y-2" aria-live="polite">
+        {showBlocked && <div id="blocked-accounts" className="mt-4 space-y-2" aria-live="polite" aria-busy={Boolean(pendingAccountId)}>
+          {blockedAccounts.length === 100 ? <p className="text-sm text-amber-800">Showing the 100 most recently blocked accounts. Older entries cannot yet be managed here.</p> : null}
           {blockedAccounts.length === 0 ? <p className="text-sm text-gray-600">No blocked accounts to display.</p> :
             blockedAccounts.map((account) => <div key={account.userId} className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 p-3">
               <span className="min-w-0 break-words text-sm font-medium text-gray-800">{account.name || 'Account'}</span>
               <button type="button" onClick={() => unblockAccount(account)} disabled={Boolean(pendingAccountId)}
-                className="shrink-0 rounded-lg border border-gray-300 px-3 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+                className="shrink-0 rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
                 Unblock
               </button>
             </div>)}
