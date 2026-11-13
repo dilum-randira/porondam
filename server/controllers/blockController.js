@@ -34,15 +34,29 @@ async function unblockUser(req, res) {
   }
 }
 
+function parsePage(value) {
+  if (value === undefined) return 1;
+  if (typeof value !== 'string' || !/^[1-9]\d{0,3}$/.test(value)) return null;
+  const page = Number(value);
+  return page <= 1000 ? page : null;
+}
+
 async function listBlocked(req, res) {
+  const page = parsePage(req.query.page);
+  if (page === null) return res.status(400).json({ message: 'Invalid page.' });
+  const limit = 25;
   try {
     const records = await Block.find({ blocker: req.user._id })
-      .sort({ createdAt: -1 }).limit(100)
+      .sort({ createdAt: -1, _id: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit + 1)
       .populate('blocked', 'name');
-    return res.json(records.filter((record) => record.blocked).map((record) => ({
+    const hasMore = records.length > limit;
+    const accounts = records.slice(0, limit).filter((record) => record.blocked).map((record) => ({
       userId: record.blocked._id, name: record.blocked.name,
       blockedAt: record.createdAt,
-    })));
+    }));
+    return res.json({ accounts, page, hasMore });
   } catch {
     return res.status(500).json({ message: 'Unable to load blocked accounts.' });
   }
