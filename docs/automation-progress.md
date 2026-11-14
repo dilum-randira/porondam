@@ -113,3 +113,11 @@ Changes were made through the GitHub connector. Local browser rendering, MongoDB
 - Pending verification: GitHub Actions build and tests, database-backed pagination and authorization tests, mobile/desktop browser review, and CI-gated merge. No production readiness claim.
 
 Next: implement report/moderation flow, private-photo access control, real MongoDB integration tests and browser checks.
+
+## 2026-11-15 — pagination CI regression repair
+
+- Inspected PR #8 and failed GitHub Actions run 43517464119: three existing mocked list tests failed because their request stubs lacked query and expected the old array response; the frontend build was skipped.
+- Updated owner-scoping, privacy, empty-list, and error-path test fixtures for the new paginated contract and query chain.
+- Added dedicated tests for invalid page rejection, authenticated-owner scoping, deterministic sort, bounded lookahead, and omission of private account fields.
+- Improved blocked-account loading announcements and avoided displaying a premature empty state while the first page is loading.
+- Validation remains conditional on the latest GitHub Actions run. Do not merge if CI fails. Browser and MongoDB-backed integration checks are still outstanding.
