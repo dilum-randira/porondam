@@ -132,8 +132,9 @@ function Matches() {
             {blockedLoading ? 'Loading...' : showBlocked ? 'Hide blocked accounts' : 'Manage blocked accounts'}
           </button>
         </div>
-        {showBlocked && <div id="blocked-accounts" className="mt-4 space-y-2" aria-live="polite" aria-busy={Boolean(pendingAccountId)}>
-          {blockedAccounts.length === 0 ? <p className="text-sm text-gray-600">No blocked accounts to display.</p> :
+        {showBlocked && <div id="blocked-accounts" className="mt-4 space-y-2" aria-live="polite" aria-busy={blockedLoading || Boolean(pendingAccountId)}>
+          {blockedLoading && blockedAccounts.length === 0 ? <p role="status" className="text-sm text-gray-600">Loading blocked accounts...</p> : null}
+          {!blockedLoading && blockedAccounts.length === 0 ? <p className="text-sm text-gray-600">No blocked accounts to display.</p> :
             blockedAccounts.map((account) => <div key={account.userId} className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 p-3">
               <span className="min-w-0 break-words text-sm font-medium text-gray-800">{account.name || 'Account'}</span>
               <button type="button" onClick={() => unblockAccount(account)} disabled={Boolean(pendingAccountId)}
