@@ -41,16 +41,18 @@ test('blocked list is owner-scoped and exposes only minimal account data', async
   let filter;
   Block.find = (query) => {
     filter = query;
-    return { sort: () => ({ limit: () => ({ populate: async () => [
+    return { sort: () => ({ skip: () => ({ limit: () => ({ populate: async () => [
       { blocked: { _id: target, name: 'Example', email: 'private@example.com' }, createdAt: new Date('2026-11-01') },
       { blocked: null },
-    ] }) }) };
+    ] }) }) }) };
   };
   const res = response();
   await listBlocked({ user: { _id: owner } }, res);
   assert.deepEqual(filter, { blocker: owner });
-  assert.equal(res.body.length, 1);
-  assert.equal(res.body[0].name, 'Example');
-  assert.equal(res.body[0].userId, target);
-  assert.equal('email' in res.body[0], false);
+  assert.equal(res.body.page, 1);
+  assert.equal(res.body.hasMore, false);
+  assert.equal(res.body.accounts.length, 1);
+  assert.equal(res.body.accounts[0].name, 'Example');
+  assert.equal(res.body.accounts[0].userId, target);
+  assert.equal('email' in res.body.accounts[0], false);
 });
