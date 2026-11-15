@@ -121,3 +121,13 @@ Next: implement report/moderation flow, private-photo access control, real Mongo
 - Added dedicated tests for invalid page rejection, authenticated-owner scoping, deterministic sort, bounded lookahead, and omission of private account fields.
 - Improved blocked-account loading announcements and avoided displaying a premature empty state while the first page is loading.
 - Validation remains conditional on the latest GitHub Actions run. Do not merge if CI fails. Browser and MongoDB-backed integration checks are still outstanding.
+
+## 2026-11-16 — pagination CI follow-up
+
+- Investigated GitHub Actions run 43647334152: backend syntax/install succeeded, but three tests failed because direct controller test requests omitted `req.query`; the frontend build was skipped. The dependency install also reported 11 audit advisories (2 moderate, 7 high, 2 critical); these require a separate dependency-level review, not an unreviewed forced upgrade.
+- Hardened the list handler to default safely when the query object is absent, matching Express default-page behavior.
+- Added regression coverage for missing query objects and the highest supported page (1000), ensuring the offset remains bounded.
+- Corrected the blocked-account UI so a failed initial load cannot be mistaken for a successful empty list.
+- These are connector commits, not evidence of a successful build. Verify the new CI run, review failures, and merge PR #8 only after passing checks. MongoDB integration and browser visual testing are still outstanding.
+
+Next: verify and merge PR #8; prioritize a targeted audit of critical/high dependency advisories, database-backed privacy tests, reporting/moderation, and mobile/desktop review.
