@@ -42,7 +42,7 @@ function parsePage(value) {
 }
 
 async function listBlocked(req, res) {
-  const page = parsePage(req.query.page);
+  const page = parsePage(req.query?.page);
   if (page === null) return res.status(400).json({ message: 'Invalid page.' });
   const limit = 25;
   try {
