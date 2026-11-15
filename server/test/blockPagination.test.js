@@ -60,3 +60,17 @@ test('defaults to the first page when no query object is supplied', async (t) =>
   assert.equal(offset, 0);
   assert.equal(pageLimit, 26);
 });
+
+
+test('accepts maximum supported page without exceeding bounded offset', async (t) => {
+  const oldFind = Block.find;
+  t.after(() => { Block.find = oldFind; });
+  let offset;
+  Block.find = () => ({ sort() { return this; }, skip(n) { offset = n; return this; },
+    limit() { return this; }, async populate() { return []; } });
+  const res = response();
+  await listBlocked({ user: { _id: new mongoose.Types.ObjectId() }, query: { page: '1000' } }, res);
+  assert.equal(res.statusCode, 200);
+  assert.equal(offset, 24975);
+  assert.equal(res.body.page, 1000);
+});
