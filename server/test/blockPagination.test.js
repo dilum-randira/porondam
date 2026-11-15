@@ -45,3 +45,18 @@ test('paginates by authenticated owner with deterministic ordering and bounded l
   assert.equal(res.body.accounts.length, 25);
   assert.equal('email' in res.body.accounts[0], false);
 });
+
+
+test('defaults to the first page when no query object is supplied', async (t) => {
+  const oldFind = Block.find;
+  t.after(() => { Block.find = oldFind; });
+  let offset, pageLimit;
+  Block.find = () => ({ sort() { return this; }, skip(n) { offset = n; return this; },
+    limit(n) { pageLimit = n; return this; }, async populate() { return []; } });
+  const res = response();
+  await listBlocked({ user: { _id: new mongoose.Types.ObjectId() } }, res);
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(res.body, { accounts: [], page: 1, hasMore: false });
+  assert.equal(offset, 0);
+  assert.equal(pageLimit, 26);
+});
