@@ -12,6 +12,7 @@ function Matches() {
   const [blockedHasMore, setBlockedHasMore] = useState(false);
   const [showBlocked, setShowBlocked] = useState(false);
   const [blockedLoading, setBlockedLoading] = useState(false);
+  const [blockedLoaded, setBlockedLoaded] = useState(false);
   const [pendingAccountId, setPendingAccountId] = useState(null);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
@@ -73,6 +74,7 @@ function Matches() {
       setBlockedAccounts((previous) => page === 1 ? accounts : [...previous, ...accounts.filter((account) => !previous.some((item) => item.userId === account.userId))]);
       setBlockedPage(page);
       setBlockedHasMore(Boolean(response.data.hasMore));
+      setBlockedLoaded(true);
       setShowBlocked(true);
     } catch (err) {
       setError(err?.response?.data?.message || 'Unable to load blocked accounts.');
@@ -134,7 +136,7 @@ function Matches() {
         </div>
         {showBlocked && <div id="blocked-accounts" className="mt-4 space-y-2" aria-live="polite" aria-busy={blockedLoading || Boolean(pendingAccountId)}>
           {blockedLoading && blockedAccounts.length === 0 ? <p role="status" className="text-sm text-gray-600">Loading blocked accounts...</p> : null}
-          {!blockedLoading && blockedAccounts.length === 0 ? <p className="text-sm text-gray-600">No blocked accounts to display.</p> :
+          {!blockedLoading && blockedLoaded && blockedAccounts.length === 0 ? <p className="text-sm text-gray-600">No blocked accounts to display.</p> :
             blockedAccounts.map((account) => <div key={account.userId} className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 p-3">
               <span className="min-w-0 break-words text-sm font-medium text-gray-800">{account.name || 'Account'}</span>
               <button type="button" onClick={() => unblockAccount(account)} disabled={Boolean(pendingAccountId)}
