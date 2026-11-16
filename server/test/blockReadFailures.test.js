@@ -15,11 +15,11 @@ function response() {
 test('blocked list returns empty array for no outgoing blocks', async (t) => {
   const oldFind = Block.find;
   t.after(() => { Block.find = oldFind; });
-  Block.find = () => ({ sort: () => ({ limit: () => ({ populate: async () => [] }) }) });
+  Block.find = () => ({ sort: () => ({ skip: () => ({ limit: () => ({ populate: async () => [] }) }) }) });
   const res = response();
   await listBlocked({ user: { _id: new mongoose.Types.ObjectId() } }, res);
   assert.equal(res.statusCode, 200);
-  assert.deepEqual(res.body, []);
+  assert.deepEqual(res.body, { accounts: [], page: 1, hasMore: false });
 });
 
 test('blocked list hides database errors', async (t) => {
