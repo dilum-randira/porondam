@@ -131,3 +131,11 @@ Next: implement report/moderation flow, private-photo access control, real Mongo
 - These are connector commits, not evidence of a successful build. Verify the new CI run, review failures, and merge PR #8 only after passing checks. MongoDB integration and browser visual testing are still outstanding.
 
 Next: verify and merge PR #8; prioritize a targeted audit of critical/high dependency advisories, database-backed privacy tests, reporting/moderation, and mobile/desktop review.
+
+## 2026-11-18 — image upload pre-storage validation (pending CI)
+- Replaced direct Cloudinary Multer storage with bounded in-memory staging (5 MB) so the server can inspect uploaded bytes before forwarding them to storage.
+- Added JPEG/PNG signature checks requiring the actual bytes, declared MIME type, and filename extension to agree; added four Node test cases.
+- Uploaded files use Cloudinary's image-only streaming API. Returned URLs must use HTTPS on res.cloudinary.com before they are stored in the user's profile.
+- Added consistent JSON errors for rejected upload size, count and type.
+- **Important:** JPEG/PNG signature checks are not full image decoding, malware scanning, or moderation. Cloudinary assets are still public; private-photo authorization is not implemented. An upload may remain in Cloudinary if the later database update fails. A 5 MB memory buffer per simultaneous request can still cause memory pressure without upload rate limits.
+- Validation status: remote commits made; local npm install, real Cloudinary integration, MongoDB and browser checks were not performed. Check PR CI before merging. Next: audit dependency advisories, enforce upload rate limits and photo ownership/privacy, handle orphaned assets and add real integration tests.
