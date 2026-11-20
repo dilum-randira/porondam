@@ -1,15 +1,20 @@
-// Instance-local, bounded protection against high-volume authentication attempts.
+// Instance-local, bounded protection against high-volume requests.
 // For multi-instance production deployments, replace with a shared trusted store.
-function createRateLimiter({ windowMs = 15 * 60 * 1000, max = 10, maxKeys = 10000, now = Date.now } = {}) {
+function createRateLimiter({ windowMs = 15 * 60 * 1000, max = 10, maxKeys = 10000, now = Date.now, keyGenerator } = {}) {
   if (!Number.isInteger(windowMs) || windowMs < 1 ||
       !Number.isInteger(max) || max < 1 ||
-      !Number.isInteger(maxKeys) || maxKeys < 1) throw new Error('Invalid rate-limit settings');
+      !Number.isInteger(maxKeys) || maxKeys < 1 ||
+      (keyGenerator !== undefined && typeof keyGenerator !== 'function')) {
+    throw new Error('Invalid rate-limit settings');
+  }
 
   const counters = new Map();
 
   return (req, res, next) => {
     const time = now();
-    const key = String(req.ip || req.socket?.remoteAddress || 'unknown');
+    // Use a trusted server-derived identity, never a caller-supplied header or body value.
+    const resolvedKey = keyGenerator ? keyGenerator(req) : (req.ip || req.socket?.remoteAddress);
+    const key = String(resolvedKey || 'unknown');
     let record = counters.get(key);
 
     if (record && time >= record.resetAt) {

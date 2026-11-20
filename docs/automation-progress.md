@@ -139,3 +139,13 @@ Next: verify and merge PR #8; prioritize a targeted audit of critical/high depen
 - Added consistent JSON errors for rejected upload size, count and type.
 - **Important:** JPEG/PNG signature checks are not full image decoding, malware scanning, or moderation. Cloudinary assets are still public; private-photo authorization is not implemented. An upload may remain in Cloudinary if the later database update fails. A 5 MB memory buffer per simultaneous request can still cause memory pressure without upload rate limits.
 - Validation status: remote commits made; local npm install, real Cloudinary integration, MongoDB and browser checks were not performed. Check PR CI before merging. Next: audit dependency advisories, enforce upload rate limits and photo ownership/privacy, handle orphaned assets and add real integration tests.
+
+## 2026-11-20 — account-scoped photo upload throttling
+
+- Extended the existing bounded process-local rate limiter with an optional trusted server-derived identity key. Existing IP-based authentication limits retain their defaults.
+- Applied an authenticated-account limit of 10 image upload attempts per 15 minutes, before Multer buffers a request or Cloudinary storage is invoked. Rejected uploads also consume attempts.
+- Added Node regression tests for cross-IP account throttling, independent account budgets, and invalid key generator configuration.
+- **Limitations:** no shared Redis/database limiter, no multi-replica guarantee, no per-IP upload limit, no end-to-end Cloudinary or MongoDB integration testing, and no private-photo access control. A user can still create multiple accounts. Keep the service away from real personal data until privacy and moderation work is complete.
+- **Verification:** changes committed through GitHub connector; CI status and mergeability must be confirmed before merging. Local npm, browser, and integration tests were not run in this connector-only execution.
+
+Next: verify CI and merge if safe; investigate critical/high dependency advisories; implement authenticated private-photo access, account reporting/moderation, and mobile/desktop visual checks.
