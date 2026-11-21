@@ -36,7 +36,9 @@ const uploadProfileImage = async (req, res) => {
       { new: true }
     ).select('-password');
     if (!updatedUser) return res.status(404).json({ message: 'User not found' });
-    return res.json(updatedUser);
+    // Return only the changed profile field, never the full account document.
+    // Legacy location and other private fields must not reach browser storage.
+    return res.json({ images: updatedUser.images });
   } catch (error) {
     console.error('Profile image upload failed');
     return res.status(500).json({ message: 'Failed to upload image' });
