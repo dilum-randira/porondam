@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import Button from '../ui/Button';
 
 function ImageUpload() {
-  const { updateUser } = useAuth();
+  const { user, updateUser } = useAuth();
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -40,7 +40,10 @@ function ImageUpload() {
         },
       });
 
-      updateUser(response.data);
+      if (!Array.isArray(response.data?.images)) {
+        throw new Error('Unexpected upload response');
+      }
+      updateUser({ ...user, images: response.data.images });
       setFile(null);
       setPreviewUrl(null);
     } catch (err) {
