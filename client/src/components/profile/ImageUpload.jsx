@@ -15,6 +15,13 @@ function ImageUpload() {
     const selectedFile = event.target.files?.[0];
     if (!selectedFile) return;
 
+    if (!['image/jpeg', 'image/png'].includes(selectedFile.type) || selectedFile.size > 5 * 1024 * 1024 || selectedFile.size === 0) {
+      setFile(null);
+      setPreviewUrl(null);
+      setError('Choose a non-empty JPEG or PNG image smaller than 5 MB.');
+      return;
+    }
+
     setFile(selectedFile);
     setPreviewUrl(URL.createObjectURL(selectedFile));
     setError('');
