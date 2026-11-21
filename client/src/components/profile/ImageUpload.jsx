@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Camera } from 'lucide-react';
 import api from '../../api/axiosConfig';
 import { useAuth } from '../../context/AuthContext';
@@ -10,6 +10,12 @@ function ImageUpload() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files?.[0];
@@ -75,13 +81,14 @@ function ImageUpload() {
         {previewUrl ? (
           <img
             src={previewUrl}
-            alt="Preview"
+            alt="Selected profile photo preview"
             className="h-20 w-20 rounded-full object-cover border-2 border-romantic-primary/60"
           />
         ) : (
           <button
             type="button"
             onClick={handleSelectClick}
+            aria-label="Choose a profile photo"
             className="h-20 w-20 rounded-full bg-romantic-soft flex items-center justify-center text-romantic-primary hover:bg-romantic-soft/80 transition-colors border border-romantic-primary/40"
           >
             <Camera className="h-7 w-7" />
@@ -102,7 +109,7 @@ function ImageUpload() {
         </div>
       </div>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
       <p className="text-xs text-romantic-muted">
         JPEG or PNG, up to 5MB. Your first photo will be used as your primary profile picture.
       </p>
