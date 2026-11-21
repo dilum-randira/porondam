@@ -149,3 +149,13 @@ Next: verify and merge PR #8; prioritize a targeted audit of critical/high depen
 - **Verification:** changes committed through GitHub connector; CI status and mergeability must be confirmed before merging. Local npm, browser, and integration tests were not run in this connector-only execution.
 
 Next: verify CI and merge if safe; investigate critical/high dependency advisories; implement authenticated private-photo access, account reporting/moderation, and mobile/desktop visual checks.
+
+## 2026-11-22 — upload response privacy and picker UX
+
+- Removed full account serialization from successful image uploads; the API now returns only the updated `images` array. This prevents legacy precise coordinates and other account fields from being copied into browser storage by this endpoint.
+- Updated the photo picker to preserve existing authenticated profile fields when merging the response, reject unsupported/empty/oversized images before network submission, release object URLs, and announce errors accessibly.
+- Added isolated Node tests verifying the minimal response serializer excludes private fields and rejects invalid input.
+- This work does not make existing Cloudinary images private. Server-side validation and rate limiting remain necessary; distributed throttling, database-backed integration tests, upload cleanup, visual browser review and dependency audit remain outstanding.
+- GitHub Actions must pass before merging. Local installed-dependency builds, real MongoDB/Cloudinary tests and browser viewport inspection were not run by the connector workflow.
+
+Next: verify CI and merge if safe; then prioritize private-photo authorization with a storage migration strategy, dependency advisories and reporting/moderation.
