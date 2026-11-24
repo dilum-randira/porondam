@@ -159,3 +159,13 @@ Next: verify CI and merge if safe; investigate critical/high dependency advisori
 - GitHub Actions must pass before merging. Local installed-dependency builds, real MongoDB/Cloudinary tests and browser viewport inspection were not run by the connector workflow.
 
 Next: verify CI and merge if safe; then prioritize private-photo authorization with a storage migration strategy, dependency advisories and reporting/moderation.
+
+
+## 2026-11-24 — account reporting API foundation
+- Created a Mongoose Report record with reporter, reported account, controlled reason, bounded description, timestamps, and pending/reviewing/resolved/dismissed status vocabulary. Added moderation-status and reporter history indexes.
+- Added input validation, rejecting invalid reasons, excessive descriptions, control characters, malformed bodies, and missing explanations for the "other" reason.
+- Added an authenticated, process-local rate-limited POST /api/reports/:userId endpoint (five attempts per account per 15 minutes). Rejects self-reporting, invalid IDs, and nonexistent targets. Response deliberately does not reveal moderation details.
+- Added four unit tests for report input validation.
+- **Important limitations:** No UI report action, staff moderation queue, administrative authorization, evidence collection, notification, deletion policy, or operational review process yet. These are pending, so reporting is not a complete user safety feature.
+- Connector source inspection and commits only. No local npm install, browser screenshots, MongoDB integration tests, or dependency audit performed. Verify GitHub Actions results before merging; do not claim the new tests passed without a run.
+- Next: add authenticated controller tests and database-backed integration tests, authorized moderation workflow, report action in profile UI with truthful confirmation, privacy retention policy, and distributed abuse limits. Continue private-photo authorization and dependency advisory triage.

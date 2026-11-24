@@ -50,3 +50,8 @@ Authenticated `POST /api/upload` accepts one JPEG or PNG image up to 5 MB. The A
 
 ### Upload response and browser preview safety
 Successful photo uploads return only `{ images: string[] }`, rather than a full user document that could expose legacy precise location or other private fields. The client merges the updated images into its existing signed-in profile. The photo picker rejects empty, oversized, and unsupported files before uploading, releases temporary browser preview URLs, and announces upload errors to assistive technology. These browser checks complement but never replace server validation. Existing public Cloudinary URLs remain publicly accessible; this is **not** private-photo authorization.
+
+### Account reporting (API foundation, not a complete moderation system)
+Authenticated accounts can submit an account report with `POST /api/reports/:userId`, passing JSON `{ "reason": "scam", "details": "Optional explanation" }`. Allowed reasons: `harassment`, `scam`, `impersonation`, `inappropriate_content`, and `other` (requires explanation). Descriptions are limited to 1000 characters. Reports are stored with a pending status; the API returns only `{ "submitted": true }`, not moderation records. Self-reporting and invalid accounts are rejected. A process-local per-account limiter permits five attempts per 15 minutes.
+
+**This is backend groundwork only:** there is no report button, moderation queue, admin authorization workflow, abuse escalation, evidence attachment, notification, or service-level response commitment. Never claim submitted reports are being reviewed until a real authorized moderation process exists. Database integration, privacy retention and deletion policies, and multi-replica throttling require further work.
